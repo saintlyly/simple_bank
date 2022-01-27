@@ -3,9 +3,12 @@ package main
 import (
 	"database/sql"
 	"log"
-	"simple_bank/api"
-	db "simple_bank/db/sqlc"
-	"simple_bank/util"
+
+	db "github.com/saintlyly/simple_bank/db/sqlc"
+
+	"github.com/saintlyly/simple_bank/api"
+
+	"github.com/saintlyly/simple_bank/util"
 
 	_ "github.com/lib/pq"
 )

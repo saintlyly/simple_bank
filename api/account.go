@@ -3,7 +3,8 @@ package api
 import (
 	"database/sql"
 	"net/http"
-	db "simple_bank/db/sqlc"
+
+	db "github.com/saintlyly/simple_bank/db/sqlc"
 
 	"github.com/gin-gonic/gin"
 )
@@ -64,6 +65,7 @@ func (server *Server) getAccount(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
+
 	ctx.JSON(http.StatusOK, account)
 
 }
