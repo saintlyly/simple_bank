@@ -37,14 +37,15 @@ func (server *Server) createAccount(ctx *gin.Context) {
 		Balance:  0,
 	}
 	account, err := server.store.CreateAccount(ctx, arg)
-	if pgErr, ok := err.(*pq.Error); ok {
-		switch pgErr.Code.Name() {
-		case "foreign_key_violation", "unique_violation":
-			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-			return
-		}
-	}
 	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok {
+			switch pqErr.Code.Name() {
+			case "foreign_key_violation", "unique_violation":
+				ctx.JSON(http.StatusForbidden, errorResponse(err))
+				return
+			}
+		}
+
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
@@ -83,17 +84,17 @@ type listAccountRequest struct {
 	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
 }
 
-func (server *Server) listAccount(ctx *gin.Context) {
+func (server *Server) listAccounts(ctx *gin.Context) {
 	var req listAccountRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-	arg := db.ListAccountParams{
+	arg := db.ListAccountsParams{
 		Limit:  req.PageSize,
 		Offset: (req.PageID - 1) * req.PageSize,
 	}
-	accounts, err := server.store.ListAccount(ctx, arg)
+	accounts, err := server.store.ListAccounts(ctx, arg)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
